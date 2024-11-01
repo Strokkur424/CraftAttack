@@ -1,7 +1,11 @@
+import org.gradle.kotlin.dsl.internal.sharedruntime.codegen.licenseHeader
+import org.jetbrains.kotlin.js.backend.NoOpSourceLocationConsumer.newLine
+
 plugins {
     kotlin("jvm") version "2.0.20"
     id("com.gradleup.shadow") version "8.3.3"
     id("io.papermc.paperweight.userdev") version "1.7.4"
+    id("net.kyori.indra.licenser.spotless") version "3.1.3"
 }
 
 group = "net.strokkur"
@@ -35,6 +39,7 @@ tasks {
 
         relocate("org.jetbrains.kotlin", "$libPath.kotlin")
     }
+
 }
 
 tasks.processResources {
@@ -44,4 +49,10 @@ tasks.processResources {
     filesMatching("paper-plugin.yml") {
         expand(props)
     }
+}
+
+indraSpotlessLicenser {
+    licenseHeaderFile(rootProject.file("HEADER"))
+    property("name", project.name)
+    property("year", "2024")
 }
