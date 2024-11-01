@@ -1,9 +1,9 @@
 name: CraftAttackReloaded
 version: '1.0-SNAPSHOT'
-main: net.strokkur.craftAttackReloaded.CraftAttackReloaded
+main: net.strokkur.craftattackreloaded.CraftAttackPlugin
 api-version: '1.21'
 prefix: CraftAttack
-load: STARTUP
+load: POSTWORLD
 authors: [ Strokkur24 ]
 description: CraftAttack plugin
 website: https://realgames.dev

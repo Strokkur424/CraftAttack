@@ -1,0 +1,16 @@
+# ╭─────────────────────────────────────────────────────────────────────────────╮
+# │                                                                             │
+# │                            Craft Attack Reloaded                            │
+# │                                by Strokkur24                                │
+# │                                                                             │
+# ╰─────────────────────────────────────────────────────────────────────────────╯
+
+elytra-name: "<!i><gradient:red:gold><bold>Starting Elytra"
+
+name-format:
+  no-status: "<playername> <yellow><deaths>"
+  with-status: "<dark_gray>[<white><status></white>]</dark_gray> <playername> <yellow><deaths>"
+
+chat-format:
+  no-status: "<playername> <dark_gray>»</dark_gray> <message>"
+  with-status: "<dark_gray>[<white><status></white>] <white><playername></white> »</dark_gray> <message>"
