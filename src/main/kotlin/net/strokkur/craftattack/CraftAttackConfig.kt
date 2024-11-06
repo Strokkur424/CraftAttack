@@ -84,6 +84,14 @@ class CraftAttackConfig {
 
         val builder = TagResolver.builder()
 
+        builder.resolvers(
+            StandardTags.color(),
+            StandardTags.decorations(),
+            StandardTags.gradient(),
+            StandardTags.rainbow(),
+            StandardTags.keybind()
+        )
+
         addPotentialTag("key", builder, StandardTags.keybind())
         addPotentialTag("lang", builder, StandardTags.transition())
         addPotentialTag("font", builder, StandardTags.font())
