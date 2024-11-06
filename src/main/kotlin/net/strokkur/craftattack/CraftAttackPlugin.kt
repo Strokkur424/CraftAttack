@@ -22,13 +22,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.strokkur.craftattackreloaded
+package net.strokkur.craftattack
 
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
-import net.strokkur.craftattackreloaded.events.ChatListener
-import net.strokkur.craftattackreloaded.events.DeathListener
-import net.strokkur.craftattackreloaded.events.JoinListener
-import net.strokkur.craftattackreloaded.events.MoveListener
+import net.strokkur.craftattack.events.ChatListener
+import net.strokkur.craftattack.events.DeathListener
+import net.strokkur.craftattack.events.JoinListener
+import net.strokkur.craftattack.events.MoveListener
 import org.bukkit.Bukkit
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
@@ -58,18 +58,15 @@ class CraftAttackPlugin: JavaPlugin() {
             val commands = event.registrar()
 
             commands.register(CraftAttackCommands.status())
-            commands.register(CraftAttackCommands.craftAttack())
+            commands.register(CraftAttackCommands.craftAttack(), listOf("ca"))
         }
-
     }
 
     override fun onEnable() {
-
         listener(DeathListener())
         listener(JoinListener())
         listener(MoveListener())
         listener(ChatListener())
-
     }
 
     override fun onDisable() {

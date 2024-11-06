@@ -5,12 +5,37 @@
 # │                                                                             │
 # ╰─────────────────────────────────────────────────────────────────────────────╯
 
+# DO NOT change this value. This is used to keep track of the current config version.
+version: 2
+
+# The name of the elytra, which you get at the start platform.
+# Set the platform with /ca setfirstpos and /ca setsecondpos
 elytra-name: "<!i><gradient:red:gold><bold>Starting Elytra"
 
+# Name formats for the tab-list and chat
 name-format:
+  # Used if the player hadn't set their status yet
   no-status: "<playername> <yellow><deaths>"
+  # Used if the player has set their status
   with-status: "<dark_gray>[<white><status></white>]</dark_gray> <playername> <yellow><deaths>"
 
+# The format for chat
 chat-format:
   no-status: "<playername> <dark_gray>»</dark_gray> <message>"
   with-status: "<dark_gray>[<white><status></white>] <white><playername></white> »</dark_gray> <message>"
+
+status:
+  # The amount of characters a status message can be at most. This setting ignores tags
+  max-len: 20
+
+  key-tag: true
+  lang-tag: true
+  font-tag: true
+  hover-tag: true
+
+  nbt-tag: false
+  click-tag: false
+  score-tag: false
+  insert-tag: false
+  newline-tag: false
+  selector-tag: false

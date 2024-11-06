@@ -22,24 +22,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.strokkur.craftattackreloaded.events
+package net.strokkur.craftattack.events
 
-import io.papermc.paper.event.player.AsyncChatEvent
-import net.strokkur.craftattackreloaded.CraftAttackConfig
+import net.strokkur.craftattack.CraftAttackPlayerData
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.PlayerDeathEvent
 
-class ChatListener : Listener {
+class DeathListener : Listener {
 
     @EventHandler
-    fun onChat(e: AsyncChatEvent) {
-
-        e.renderer { source, _, message, _ ->
-            return@renderer CraftAttackConfig.get().getChatFormat(
-                source, message
-            );
-        }
-
+    fun onPlayerDeath(e: PlayerDeathEvent) {
+        CraftAttackPlayerData.get().addDeath(e.player.uniqueId)
+        CraftAttackPlayerData.get().setPlayerListName(e.player)
     }
 
 }

@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.strokkur.craftattackreloaded
+package net.strokkur.craftattack
 
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.StringArgumentType
@@ -31,6 +31,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import net.kyori.adventure.text.minimessage.MiniMessage.miniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText
 import org.bukkit.entity.Player
 
 object CraftAttackCommands {
@@ -81,7 +82,20 @@ object CraftAttackCommands {
                 ctx.source.sender.sendRichMessage("<green><bold>[!]</bold> Successfully reloaded the config!")
 
                 return@executes Command.SINGLE_SUCCESS
+            })
+            .then(Commands.literal("save-data").executes { ctx ->
 
+                CraftAttackPlayerData.get().save()
+                ctx.source.sender.sendRichMessage("<green><bold>[!]</bold> Successfully saved all player data!")
+
+                return@executes Command.SINGLE_SUCCESS
+            })
+            .then(Commands.literal("load-data").executes { ctx ->
+
+                CraftAttackPlayerData.get().load()
+                ctx.source.sender.sendRichMessage("<gold><bold>[!]</bold> Successfully loaded all player data from file!")
+
+                return@executes Command.SINGLE_SUCCESS
             })
             .build()
     }
@@ -97,14 +111,27 @@ object CraftAttackCommands {
                     }
 
                     val player = ctx.source.sender as Player
-                    val format = miniMessage().deserialize(ctx.getArgument("format", String::class.java))
+                    val format = ctx.getArgument("format", String::class.java)
+
+                    val config = CraftAttackConfig.get()
+                    val asComponent = config.miniMessage.deserialize(format)
+
+                    if (plainText().serialize(asComponent).length > config.maxStatusLen()) {
+                        player.sendMessage(
+                            miniMessage().deserialize(
+                                "<red><bold>[!]</bold> Your input exceeds character limit! (${config.maxStatusLen()})",
+                                Placeholder.component("status", asComponent)
+                            )
+                        )
+                        return@executes Command.SINGLE_SUCCESS
+                    }
 
                     CraftAttackPlayerData.get().setStatus(player.uniqueId, format)
 
                     player.sendMessage(
                         miniMessage().deserialize(
                             "<bold>[!]</bold> Your status is now set to <status>!",
-                            Placeholder.component("status", format)
+                            Placeholder.component("status", asComponent)
                         )
                     )
 
@@ -113,6 +140,12 @@ object CraftAttackCommands {
                 }
             )
             .executes { ctx ->
+                if (ctx.source.sender !is Player) {
+                    ctx.source.sender.sendRichMessage("<red><bold>[!]</bold> You can't do that!")
+                    return@executes Command.SINGLE_SUCCESS
+                }
+
+                CraftAttackPlayerData.get().setStatus((ctx.source.sender as Player).uniqueId, null)
                 ctx.source.sender.sendRichMessage("<green><bold>[!]</bold> Successfully removed your status!")
                 return@executes Command.SINGLE_SUCCESS
             }

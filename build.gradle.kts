@@ -1,6 +1,3 @@
-import org.gradle.kotlin.dsl.internal.sharedruntime.codegen.licenseHeader
-import org.jetbrains.kotlin.js.backend.NoOpSourceLocationConsumer.newLine
-
 plugins {
     kotlin("jvm") version "2.0.20"
     id("com.gradleup.shadow") version "8.3.3"
@@ -9,7 +6,7 @@ plugins {
 }
 
 group = "net.strokkur"
-version = "1.0-SNAPSHOT"
+version = "1.1"
 
 repositories {
     mavenCentral()
@@ -35,11 +32,15 @@ tasks {
     }
 
     shadowJar {
-        val libPath = "net.strokkur.craftattackreloaded.libs"
+        archiveClassifier.set("")
 
+        val libPath = "net.strokkur.craftattackreloaded.libs"
         relocate("org.jetbrains.kotlin", "$libPath.kotlin")
     }
 
+    jar {
+        archiveClassifier.set("noshade")
+    }
 }
 
 tasks.processResources {

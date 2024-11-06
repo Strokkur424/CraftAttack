@@ -22,18 +22,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.strokkur.craftattackreloaded.events
+package net.strokkur.craftattack.events
 
-import net.strokkur.craftattackreloaded.CraftAttackPlayerData
+import net.strokkur.craftattack.CraftAttackPlayerData
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.entity.PlayerDeathEvent
+import org.bukkit.event.player.PlayerJoinEvent
 
-class DeathListener : Listener {
+class JoinListener: Listener {
 
     @EventHandler
-    fun onPlayerDeath(e: PlayerDeathEvent) {
-        CraftAttackPlayerData.get().addDeath(e.player.uniqueId)
+    fun onJoin(e: PlayerJoinEvent) {
         CraftAttackPlayerData.get().setPlayerListName(e.player)
     }
 

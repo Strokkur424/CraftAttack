@@ -22,10 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.strokkur.craftattackreloaded.events
+package net.strokkur.craftattack.events
 
-import net.strokkur.craftattackreloaded.CraftAttackConfig
-import net.strokkur.craftattackreloaded.CraftAttackPlugin
+import net.strokkur.craftattack.CraftAttackConfig
+import net.strokkur.craftattack.CraftAttackPlugin
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.enchantments.Enchantment
@@ -46,11 +46,23 @@ class MoveListener: Listener {
         private var bound: BoundingBox = BoundingBox()
         private val inZone: MutableList<Player> = mutableListOf()
 
+        private var isPosSet: Boolean = false
+
         fun reloadBound() {
+            reloadBound(CraftAttackConfig.get())
+        }
+
+        fun reloadBound(craftAttackConfig: CraftAttackConfig) {
+            if (!craftAttackConfig.isPosSet()) {
+                isPosSet = false
+                return
+            }
+
             bound = BoundingBox.of(
-                CraftAttackConfig.get().getFirstPos().block,
-                CraftAttackConfig.get().getSecondPos().block
+                craftAttackConfig.getFirstPos().block,
+                craftAttackConfig.getSecondPos().block
             )
+            isPosSet = true
         }
     }
 
@@ -60,6 +72,10 @@ class MoveListener: Listener {
 
     @EventHandler
     fun onMove(e: PlayerMoveEvent) {
+
+        if (!isPosSet) {
+            return
+        }
 
         val p = e.player
 

@@ -22,12 +22,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.strokkur.craftattackreloaded
+package net.strokkur.craftattack
 
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.MiniMessage.miniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
-import net.strokkur.craftattackreloaded.events.MoveListener
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
+import net.kyori.adventure.text.minimessage.tag.standard.StandardTags
+import net.strokkur.craftattack.events.MoveListener
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.configuration.file.YamlConfiguration
@@ -39,7 +42,9 @@ class CraftAttackConfig {
 
     private val plugin: CraftAttackPlugin = CraftAttackPlugin.plugin()
     private val file: File = plugin.dataFolder.resolve("general.yml")
-    private var cfg: YamlConfiguration
+    private var cfg: YamlConfiguration = YamlConfiguration()
+
+    var miniMessage: MiniMessage = miniMessage()
 
     companion object {
         private var instance: CraftAttackConfig? = null
@@ -58,7 +63,7 @@ class CraftAttackConfig {
             plugin.saveResource("general.yml", true)
         }
 
-        cfg = YamlConfiguration.loadConfiguration(file)
+        reload()
     }
 
     private fun save() {
@@ -72,8 +77,38 @@ class CraftAttackConfig {
 
     fun reload() {
         cfg = YamlConfiguration.loadConfiguration(file)
+        ConfigUpdater.update(cfg)
+        save()
 
-        MoveListener.reloadBound()
+        MoveListener.reloadBound(this)
+
+        val builder = TagResolver.builder()
+
+        addPotentialTag("key", builder, StandardTags.keybind())
+        addPotentialTag("lang", builder, StandardTags.transition())
+        addPotentialTag("font", builder, StandardTags.font())
+        addPotentialTag("hover", builder, StandardTags.hoverEvent())
+
+        addPotentialTag("nbt", builder, StandardTags.nbt())
+        addPotentialTag("click", builder, StandardTags.clickEvent())
+        addPotentialTag("score", builder, StandardTags.score())
+        addPotentialTag("insert", builder, StandardTags.insertion())
+        addPotentialTag("newline", builder, StandardTags.newline())
+        addPotentialTag("selector", builder, StandardTags.selector())
+
+        miniMessage = MiniMessage.builder().tags(builder.build()).build()
+    }
+
+    private fun addPotentialTag(tagName: String, builder: TagResolver.Builder, tag: TagResolver) {
+        if (cfg.getBoolean("status.$tagName-tag")) {
+            builder.resolver(tag)
+        }
+    }
+
+    fun isPosSet(): Boolean {
+        return Bukkit.getWorld(cfg.getString("eyltra-position.spawn-world", "")!!) != null
+               && cfg["elytra-position.pos-1"] != null
+               && cfg["elytra-position.pos-1"] != null
     }
 
     fun setFirstPos(player: Player) {
@@ -98,7 +133,7 @@ class CraftAttackConfig {
 
     fun getFirstPos(): Location {
         return Location(
-            Bukkit.getWorld(cfg.getString("elytra-position.spawn-world", "world")!!),
+            Bukkit.getWorld(cfg.getString("elytra-position.spawn-world")!!),
             cfg.getDouble("elytra-position.pos-1.x", 0.0),
             cfg.getDouble("elytra-position.pos-1.y", 0.0),
             cfg.getDouble("elytra-position.pos-1.z", 0.0)
@@ -154,5 +189,9 @@ class CraftAttackConfig {
             Placeholder.component("status", status),
             Placeholder.component("message", message)
         )
+    }
+
+    fun maxStatusLen(): Int {
+        return cfg.getInt("status.max-len", 20)
     }
 }

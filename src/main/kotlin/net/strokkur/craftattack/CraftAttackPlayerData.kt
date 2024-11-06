@@ -22,9 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.strokkur.craftattackreloaded
+package net.strokkur.craftattack
 
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage.miniMessage
@@ -35,7 +36,7 @@ import java.util.*
 
 class CraftAttackPlayerData {
 
-    private val statuses: MutableMap<UUID, Data>
+    private var statuses: MutableMap<UUID, Data> = HashMap()
     private val file: File = CraftAttackPlugin.plugin().dataFolder.resolve("player_data.json")
 
     companion object {
@@ -52,7 +53,18 @@ class CraftAttackPlayerData {
     }
 
     init {
+        load()
+    }
 
+    fun save() {
+        if (!file.exists()) {
+            file.createNewFile()
+        }
+
+        Files.writeString(file.toPath(), GsonBuilder().setPrettyPrinting().create().toJson(statuses))
+    }
+
+    fun load() {
         if (file.exists()) {
             val json = Files.readString(file.toPath())
             CraftAttackPlugin.plugin().logger.info("Read the following json: $json")
@@ -63,28 +75,17 @@ class CraftAttackPlayerData {
         }
     }
 
-    fun save() {
-
-        if (!file.exists()) {
-            file.createNewFile()
-        }
-
-        Files.writeString(file.toPath(), Gson().toJson(statuses))
-    }
-
     fun getStatus(uuid: UUID): Component? {
         return statuses[uuid]?.cStatus()
     }
 
-    fun setStatus(uuid: UUID, component: Component?) {
-        val deserialized: String? = if (component == null) null else miniMessage().serialize(component)
-
+    fun setStatus(uuid: UUID, component: String?) {
         if (statuses[uuid] == null) {
-            statuses[uuid] = Data(deserialized)
+            statuses[uuid] = Data(component)
             return;
         }
 
-        statuses[uuid]?.status = deserialized
+        statuses[uuid]?.status = component
         save()
     }
 
@@ -124,10 +125,17 @@ class CraftAttackPlayerData {
     private class Data(var status: String? = null, var deaths: Int = 0) {
         fun cStatus(): Component? {
             if (status == null) {
-                return null;
+                return null
             }
 
-            return miniMessage().deserialize(status!!);
+            try {
+                val out = CraftAttackConfig.get().miniMessage.deserialize(status!!)
+                return out
+            }
+            catch (exception: Exception) {
+                // Somehow this can lead to an error, so let's not do that
+                return null
+            }
         }
     }
 }
